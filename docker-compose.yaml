@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-backend
+    restart: unless-stopped
+    networks:
+      - coolify
+    volumes:
+      - .:/var/www/html
+      - logs:/var/www/html/storage/logs
+    ports:
+      - "8085:8080"
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-queue
+    restart: unless-stopped
+    networks:
+      - coolify
+    depends_on:
+      - backend
+    command: >
+      php artisan queue:work redis
+        --timeout=600
+        --sleep=3
+        --tries=3
+        --max-time=3600
+        --max-jobs=1000
+        --memory=512
+        --queue=default,high,low
+
+networks:
+  coolify:
+    driver: bridge
+
+volumes:
+  logs:
