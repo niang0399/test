@@ -16,10 +16,6 @@ RUN rm -rf /var/www/html/.composer/cache
 # Switch to non-root user
 USER www-data
 
-Réagir
-
-Répondre
-
 
 
 
